@@ -65,6 +65,7 @@ colores[2048] = 0xC7B478
 colores[4096] = 0xC7C778
 
 let casilla_numero = "casilla"
+let gameOver = false
 
 
 
@@ -86,6 +87,8 @@ class MyGame extends Phaser.Scene
       
     create ()
     {
+        // game_over()
+
         thisD = this
         rect_fisico = this.physics.add.group();
         casillas = this.physics.add.group();
@@ -239,7 +242,7 @@ let crear_rect_y_txt = function() {
             r1.setTint(0x494949)            
 
             tablero[k][i] = r1       
-
+            tablero.game = null
             x = x + 110
             casilla = casilla + 1
             }
@@ -631,6 +634,7 @@ let chquear_distancias = function()
 let crear_numero_nuevo = function () {
 
     restaurar_tableroDelta()
+
     if (crear_numero_en_h === "chequear")
     {
         for (let i = 0; i < 4; i++ )
@@ -679,5 +683,48 @@ let crear_numero_nuevo = function () {
     tablero[crear_numero_en_v][crear_numero_en_h].game = contenedor
 
     tabla_casillas_vacias = []
+    
+    game_over()
 
+}
+
+let game_over = function () {
+    let quedan_espacios = 0
+    for (let k = 0; k < 4; k++){
+        
+        for (let v = 0; v < 4; v++){
+            // console.log(v)
+            if (tablero[k][v].game !== null){
+                // console.log(tablero[k][v])
+                quedan_espacios = quedan_espacios +1
+
+            }
+
+        }
+    }  
+    // console.log(quedan_espacios)
+    if (quedan_espacios === 16){
+        console.log("chequear si se puede ganar.")
+        game_over2()
+    } 
+}
+
+let game_over2 = function() {
+    for (let k = 0; k < 3; k++){
+        
+        for (let v = 0; v < 3; v++){
+            if (tablero[k][v].game.list[0].valor === tablero[k+1][v].game.list[0].valor || tablero[k][v].game.list[0].valor === tablero[k][v+1].game.list[0].valor){
+                console.log("aun se puede jugar.")
+                return
+            }
+
+        }
+
+    }
+    console.log("game over definitivo.")
+    game_over3()
+}
+
+let game_over3 = function(){
+    gameOver = true
 }
