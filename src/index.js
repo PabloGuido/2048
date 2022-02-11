@@ -46,6 +46,9 @@ let t2048
 // -------------------------------
 let crear_numero_en_v
 let crear_numero_en_h
+let gameOver_contenedor
+let score = 0
+let score_txt
 
 
 // -------------------------------
@@ -96,6 +99,8 @@ class MyGame extends Phaser.Scene
         base = this.add.image(400, 300, 'base');
         base.setTint(0x74719B);
 
+
+
         crear_rect_y_txt()
 
         // Activa las flechas del teclado
@@ -111,15 +116,10 @@ class MyGame extends Phaser.Scene
 
         thisD.add.text(680, 555, "Controls: ↑ ↓ ← → ", {fontSize: '22px', fill: "white"}).setOrigin(0.5, 0.5)
         thisD.add.text(680, 580, "or swipe.", {fontSize: '22px', fill: "white"}).setOrigin(0.5, 0.5)
+
+        score_txt = thisD.add.text(0, 0, "Score: " + score, {fontSize: '30px', fill: "white"})
         // console.log(tablero)
 
-        // this.input.on('pointerdown', function(pointer){
-
-        // touchX = pointer.x;
-        // touchY = pointer.y;
-        // console.log(touchY)
-        // // ...
-        // });
 
         this.input.on('pointerup', function(pointer){
             if (se_puede_mover === true)
@@ -155,7 +155,8 @@ class MyGame extends Phaser.Scene
             }
 
     });
-
+        // game_over3()
+        // console.log(tablero)
     }
 
     update ()
@@ -201,9 +202,9 @@ class MyGame extends Phaser.Scene
             
         }
 
-
-
-    chquear_distancias()
+        if (gameOver === false){
+            chquear_distancias()    
+        }
     }
 }
 
@@ -242,7 +243,7 @@ let crear_rect_y_txt = function() {
             r1.setTint(0x494949)            
 
             tablero[k][i] = r1       
-            tablero.game = null
+            // tablero.game = null
             x = x + 110
             casilla = casilla + 1
             }
@@ -281,6 +282,8 @@ let inicar_tablero = function () {
         suma = suma + 2
 
     };
+    gameOver = false
+    se_puede_mover = true
 
 };
 
@@ -341,8 +344,8 @@ let comparar = function (sumaRestaH, sumaRestaV, h, v)
 
             
             tablero[h][v].game.list[0].valor = tablero[h][v].game.list[0].valor + tablero[h][v].game.list[0].valor
-
-
+            score = score + tablero[h][v].game.list[0].valor
+            score_txt.setText("Score: " + score);
             tablero[h][v].game.list[0].destino = tablero[h + sumaRestaH][v + sumaRestaV]
 
 
@@ -681,6 +684,8 @@ let crear_numero_nuevo = function () {
     thisD.physics.world.enableBody(contenedor);
 
     tablero[crear_numero_en_v][crear_numero_en_h].game = contenedor
+    score = score + rect_nuevo.valor
+    score_txt.setText("Score: " + score);
 
     tabla_casillas_vacias = []
     
@@ -708,18 +713,22 @@ let game_over = function () {
         game_over2()
     } 
 }
-
+// tablero[k][v].game.list[0].valor
 let game_over2 = function() {
-    for (let k = 0; k < 3; k++){
+    for (let k = 0; k < 4; k++){
         
         for (let v = 0; v < 3; v++){
-            if (tablero[k][v].game.list[0].valor === tablero[k+1][v].game.list[0].valor || tablero[k][v].game.list[0].valor === tablero[k][v+1].game.list[0].valor){
-                console.log("aun se puede jugar.")
+            if (tablero[k][v].game.list[0].valor === tablero[k][v + 1].game.list[0].valor){
                 return
             }
-
         }
-
+    }
+    for (let a = 0; a < 4; a++){
+            for (let b = 0; b < 3; b++){
+            if (tablero[b][a].game.list[0].valor === tablero[b + 1][a].game.list[0].valor){
+                return
+            }
+        }
     }
     console.log("game over definitivo.")
     game_over3()
@@ -727,4 +736,57 @@ let game_over2 = function() {
 
 let game_over3 = function(){
     gameOver = true
+    cartel_game_over()
+}
+
+let cartel_game_over = function () {
+    se_puede_mover = false
+    let gameOver_box = thisD.add.image(0, 0, 'base');
+    gameOver_box.scaleX = 0.75
+    gameOver_box.scaleY = 0.43
+    gameOver_box.alpha = 0.95
+    let gameOver_box_t = thisD.add.text(0, -75, "Game Over", {fontSize: '36px', fill: "white", fontStyle: "bold"}).setOrigin(0.5, 0.5)
+    let gameOver_score_t = thisD.add.text(0, -30, "Score: " + score, {fontSize: '32px', fill: "white", fontStyle: "bold"}).setOrigin(0.5, 0.5)
+    let gameOver_newGame = thisD.add.image(0, 40, 'base');
+    gameOver_newGame.setInteractive();
+    gameOver_newGame.on('pointerup', function() { 
+        // console.log('pointerup'); 
+        gameOver_newGame.removeInteractive()
+        gameOver_contenedor.destroy()
+        
+        restart_game();
+    });
+    
+    gameOver_newGame.scaleX = 0.4
+    gameOver_newGame.scaleY = 0.1
+    gameOver_newGame.setTint(0x74719B);
+    let gameOver_newGame_t = thisD.add.text(0, 40, "New game", {fontSize: '24px', fill: "white", fontStyle: "bold"}).setOrigin(0.5, 0.5)
+    let gameOver_contenedor = thisD.add.container(400, 300, [gameOver_box, gameOver_box_t, gameOver_score_t,gameOver_newGame,gameOver_newGame_t])
+    gameOver_contenedor.alpha = 0
+    thisD.tweens.add({
+    targets: gameOver_contenedor,
+    alpha: { value: 1, duration: 1000, ease: 'Power1' },
+
+    });
+
+}
+
+let restart_game = function () {
+    score = 0;
+    score_txt.setText("Score: " + score);
+    restaurar_tableroDelta()
+    tabla_casillas_vacias = []
+    for (let k = 0; k < 4; k++)
+    {
+        for (let v = 0; v < 4; v++){
+            if (tablero[k][v].game !== null){
+
+            tablero[k][v].game.destroy();
+            tablero[k][v].game = null
+            // console.log(tablero[k][v])
+
+            }
+        }
+    }
+    inicar_tablero()
 }
