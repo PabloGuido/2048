@@ -4,7 +4,7 @@ import Phaser from 'phaser';
 // cambiar el movimiento por tween
 // poner css
 // poner win y lose
-// ver si es necsario flaggear mas los swipes
+// ver si es necsario flaggear mas los swipes [ok?]
 
 let thisD
 let rect_fisico
@@ -69,7 +69,8 @@ colores[4096] = 0xC7C778
 
 let casilla_numero = "casilla"
 let gameOver = false
-
+let gameWin = false
+let gameWin_flag = false
 
 
 
@@ -120,6 +121,30 @@ class MyGame extends Phaser.Scene
         score_txt = thisD.add.text(0, 0, "Score: " + score, {fontSize: '30px', fill: "white"})
         // console.log(tablero)
 
+        let newGame_reset = thisD.add.image(700, 30, 'base');
+        newGame_reset.scaleX = 0.4
+        newGame_reset.scaleY = 0.085
+        newGame_reset.setTint(0x74719B);
+        newGame_reset.setInteractive();
+        newGame_reset.on('pointerup', function() { 
+            if (se_puede_mover === true){
+                let volver_escala = function() {
+                    newGame_reset.scaleX = 0.4
+                    newGame_reset.scaleY = 0.085
+                }
+                thisD.tweens.add({
+                targets: newGame_reset,
+                scaleX: 0.45,
+                scaleY: 0.095,
+                ease: 'Power1',
+                duration: 100,
+                onComplete: volver_escala
+                });
+                restart_game();
+
+            }
+        });
+        let newGame_reset_txt = thisD.add.text(700, 30, "New game", {fontSize: '30px', fill: "white"}).setOrigin(0.5, 0.5)
 
         this.input.on('pointerup', function(pointer){
             if (se_puede_mover === true)
@@ -193,13 +218,7 @@ class MyGame extends Phaser.Scene
                 crear_numero_en_v = "chequear"
                 crear_numero_en_h = 0
                 registro(derecha)                
-            }
-
-
-
-
-
-            
+            }            
         }
 
         if (gameOver === false){
@@ -354,8 +373,11 @@ let comparar = function (sumaRestaH, sumaRestaV, h, v)
             tablero[h + sumaRestaH][v + sumaRestaV].game = tablero[h][v].game
             tablero[h + sumaRestaH][v + sumaRestaV].game.anim = true
             tableroDelta[h][v] = 1 
-            tableroDelta[h + sumaRestaH][v + sumaRestaV] = 1      
+            tableroDelta[h + sumaRestaH][v + sumaRestaV] = 1
 
+            if (tablero[h + sumaRestaH][v + sumaRestaV].game.list[0].valor === 2048 && gameWin === false){
+                gameWin = true
+            }      
 
 
 
@@ -521,9 +543,9 @@ let registro = function (flecha) {
         // console.log(tablero[3])            
         // console.log("-------------------")
 
-        setTimeout(function del(argument) {
-            se_puede_mover = true
-        }, 310)   
+        // setTimeout(function del(argument) {
+        //     se_puede_mover = true
+        // }, 310)   
 
         
         algo_se_movio = false
@@ -688,6 +710,11 @@ let crear_numero_nuevo = function () {
     score_txt.setText("Score: " + score);
 
     tabla_casillas_vacias = []
+    se_puede_mover = true
+    if (gameWin === true && gameWin_flag === false){
+        gameWin_flag = true
+        win_2048()
+    }
     
     game_over()
 
@@ -766,7 +793,6 @@ let cartel_game_over = function () {
     thisD.tweens.add({
     targets: gameOver_contenedor,
     alpha: { value: 1, duration: 1000, ease: 'Power1' },
-
     });
 
 }
@@ -789,4 +815,29 @@ let restart_game = function () {
         }
     }
     inicar_tablero()
+}
+
+let win_2048 = function () {
+    console.log("ganaste!")
+    se_puede_mover = false
+    gameWin = true
+    let gameWin_box = thisD.add.image(0, 0, 'base');
+    gameWin_box.scaleX = 0.75
+    gameWin_box.scaleY = 0.43
+    gameWin_box.alpha = 0.95
+    let gameWin_box_t1 = thisD.add.text(0, -65, "Congratulations!", {fontSize: '32px', fill: "white", fontStyle: "bold"}).setOrigin(0.5, 0.5)
+    let gameWin_box_t2 = thisD.add.text(0, -25, "You won.", {fontSize: '32px', fill: "white", fontStyle: "bold"}).setOrigin(0.5, 0.5)
+    let gameWin_newGame = thisD.add.image(0, 40, 'base');
+    gameWin_newGame.scaleX = 0.4
+    gameWin_newGame.scaleY = 0.1
+    gameWin_newGame.setTint(0x74719B);
+    gameWin_newGame.setInteractive();
+    gameWin_newGame.on('pointerup', function() { 
+    gameWin_newGame.removeInteractive()
+    gameWin_contenedor.destroy()
+    se_puede_mover = true
+    });
+
+    let gameWin_newGame_t = thisD.add.text(0, 40, "Continue", {fontSize: '24px', fill: "white", fontStyle: "bold"}).setOrigin(0.5, 0.5)
+    let gameWin_contenedor = thisD.add.container(400, 300, [gameWin_box, gameWin_box_t1, gameWin_box_t2, gameWin_newGame, gameWin_newGame_t])
 }
