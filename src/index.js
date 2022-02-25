@@ -582,7 +582,7 @@ let modificar_valores = function (tween, targets, casillaM){
         let qqq = casillaM.game.list[0].valor
         let ls = letra_size(qqq)
 
-        console.log("modifica?")
+        // console.log("modifica?")
         
         if (casillaM.game.anim === true)
             {
@@ -593,7 +593,7 @@ let modificar_valores = function (tween, targets, casillaM){
                 casillaM.game.list[1].setFontSize(ls);
                 casillaM.game.list[1].setText(qqq);
                 casillaM.game.list[0].setTint(colores[qqq])
-                console.log("volver escala 1")
+                // console.log("volver escala 1")
 
             }
 
