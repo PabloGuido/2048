@@ -49,6 +49,9 @@ let crear_numero_en_h
 let gameOver_contenedor
 let score = 0
 let score_txt
+let high_score = 0
+let high_score_txt
+let set_high_score
 
 
 // -------------------------------
@@ -92,7 +95,8 @@ class MyGame extends Phaser.Scene
     create ()
     {
         // game_over()
-
+        high_score = localStorage.getItem("high_score");
+        // console.log(load_high_score)
         thisD = this
         rect_fisico = this.physics.add.group();
         casillas = this.physics.add.group();
@@ -119,6 +123,7 @@ class MyGame extends Phaser.Scene
         thisD.add.text(680, 580, "or swipe.", {fontSize: '22px', fill: "white"}).setOrigin(0.5, 0.5)
 
         score_txt = thisD.add.text(0, 0, "Score: " + score, {fontSize: '30px', fill: "white"})
+        high_score_txt = thisD.add.text(0, 26, "High score: " + high_score, {fontSize: '22px', fill: "white"})
         // console.log(tablero)
 
         let newGame_reset = thisD.add.image(700, 30, 'base');
@@ -364,7 +369,10 @@ let comparar = function (sumaRestaH, sumaRestaV, h, v)
             
             tablero[h][v].game.list[0].valor = tablero[h][v].game.list[0].valor + tablero[h][v].game.list[0].valor
             score = score + tablero[h][v].game.list[0].valor
+
+
             score_txt.setText("Score: " + score);
+            set_high_score()
             tablero[h][v].game.list[0].destino = tablero[h + sumaRestaH][v + sumaRestaV]
 
 
@@ -536,11 +544,11 @@ let registro = function (flecha) {
     if (algo_se_movio === true)
     {
 
-        console.log("-------------------")
-        console.log(tablero[0])
-        console.log(tablero[1])
-        console.log(tablero[2])
-        console.log(tablero[3])            
+        // console.log("-------------------")
+        // console.log(tablero[0])
+        // console.log(tablero[1])
+        // console.log(tablero[2])
+        // console.log(tablero[3])            
         // console.log("-------------------")
 
         // setTimeout(function del(argument) {
@@ -555,7 +563,7 @@ let registro = function (flecha) {
             {
                tabla_visaul[i].destroy();
             }
-        }, 135)
+        }, 40)
 
         setTimeout(crear_numero_nuevo, 300)
 
@@ -677,13 +685,10 @@ let chquear_distancias = function()
 
                                 });
                         }
-                        // [1].game.list[1]._text
+
                         if (tablero[k][v].game.list[0].test != null)
                         {
-                            // tablero[k][v].game.list[0].test.body.reset(tablero[k][v].game.list[0].destino.x, tablero[k][v].game.list[0].destino.y);
 
-                            // tablero[k][v].game.list[0].test.destroy();
-                            // tablero[k][v].game.list[0].test = null
 
                         }                        
                     }
@@ -745,6 +750,7 @@ let crear_numero_nuevo = function () {
     tablero[crear_numero_en_v][crear_numero_en_h].game = contenedor
     score = score + rect_nuevo.valor
     score_txt.setText("Score: " + score);
+    set_high_score()
 
     tabla_casillas_vacias = []
     se_puede_mover = true
@@ -877,4 +883,12 @@ let win_2048 = function () {
 
     let gameWin_newGame_t = thisD.add.text(0, 40, "Continue", {fontSize: '24px', fill: "white", fontStyle: "bold"}).setOrigin(0.5, 0.5)
     let gameWin_contenedor = thisD.add.container(400, 300, [gameWin_box, gameWin_box_t1, gameWin_box_t2, gameWin_newGame, gameWin_newGame_t])
+}
+
+set_high_score = function() {
+    if (score > high_score){
+        high_score = score
+        high_score_txt.setText("High score: " + score)
+        localStorage.setItem("high_score", JSON.stringify(high_score));
+    }
 }
