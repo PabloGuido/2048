@@ -222,7 +222,7 @@ class MyGame extends Phaser.Scene
         }
 
         if (gameOver === false){
-            chquear_distancias()    
+            // chquear_distancias()    
         }
     }
 }
@@ -536,11 +536,11 @@ let registro = function (flecha) {
     if (algo_se_movio === true)
     {
 
-        // console.log("-------------------")
-        // console.log(tablero[0])
-        // console.log(tablero[1])
-        // console.log(tablero[2])
-        // console.log(tablero[3])            
+        console.log("-------------------")
+        console.log(tablero[0])
+        console.log(tablero[1])
+        console.log(tablero[2])
+        console.log(tablero[3])            
         // console.log("-------------------")
 
         // setTimeout(function del(argument) {
@@ -567,23 +567,64 @@ let registro = function (flecha) {
             
 }
 
+let modificar_valores = function (tween, targets, casillaM){
+
+    if (casillaM.game != null && casillaM.game.list[0].destino != null && casillaM.game.list[0].destino != undefined)
+    {  
+        let qqq = casillaM.game.list[0].valor
+        let ls = letra_size(qqq)
+
+        console.log("modifica?")
+        
+        if (casillaM.game.anim === true)
+            {
+            casillaM.game.anim = false
+            let volver_scala_1 = function ( trg) {
+
+                casillaM.game.setScale(1)
+                casillaM.game.list[1].setFontSize(ls);
+                casillaM.game.list[1].setText(qqq);
+                casillaM.game.list[0].setTint(colores[qqq])
+                console.log("volver escala 1")
+
+            }
+
+            thisD.tweens.add({
+                    targets: casillaM.game,
+                    scale: 1.1,
+                    ease: 'Power1',
+                    duration: 25,
+                    onComplete: volver_scala_1,
+                    // onCompleteParams: [casillaM.game]
+                    
+            });
+        }
+    }
+}
+
 let animaciones = function () {
     for (let k = 0; k < 4; k++)
         {
             for (let v = 0; v < 4; v++)
             {
                 if (tablero[k][v].game != null && tablero[k][v].game.list[0].destino != null)
-                {
-                    thisD.physics.moveToObject(tablero[k][v].game, tablero[k][v].game.list[0].destino,600, 200);
-                    if (tablero[k][v].game.list[0].test != null)
-                    {
-                        thisD.physics.moveToObject(tablero[k][v].game.list[0].test, tablero[k][v].game.list[0].destino, 600, 200);
-                    }
-                }
+                {   
+                    // console.log("animaciones")
+                    thisD.tweens.add({
+                        targets: tablero[k][v].game,
+                        x: tablero[k][v].game.list[0].destino.x,
+                        y: tablero[k][v].game.list[0].destino.y,
+                        ease: 'Power1',
+                        duration: 150,
+                        onComplete : modificar_valores,
+                        onCompleteParams:[tablero[k][v]] 
 
+                    });
+                }
             }
         }
 }
+
 
 let restaurar_tableroDelta = function () {
     tableroDelta[0] = [0,0,0,0]
@@ -601,9 +642,7 @@ let chquear_distancias = function()
         {
 
         if (tablero[k][v].game != null && tablero[k][v].game.list[0].destino != null && tablero[k][v].game.list[0].destino != undefined)
-        {
-            
-            
+        {           
             
             let distance = Phaser.Math.Distance.Between(tablero[k][v].game.x, tablero[k][v].game.y, tablero[k][v].game.list[0].destino.x, tablero[k][v].game.list[0].destino.y);
 
@@ -638,8 +677,6 @@ let chquear_distancias = function()
 
                                 });
                         }
-
-
                         // [1].game.list[1]._text
                         if (tablero[k][v].game.list[0].test != null)
                         {
