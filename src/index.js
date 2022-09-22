@@ -1,10 +1,7 @@
 import Phaser from 'phaser';
 // import logoImg from './assets/base.png';
 
-// cambiar el movimiento por tween
-// poner css
-// poner win y lose
-// ver si es necsario flaggear mas los swipes [ok?]
+
 
 let thisD
 let rect_fisico
